@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
-import { Binary } from "mongodb";
 
 // **** Types **** //
 
 export interface IFile {
-  id?: string;
+  _id?: any;
   fileName: string;
-  userId: string;
   gridFsId?: string;
-  content?: Binary;
+  deleted?: boolean;
+  createdBy: string;
+  updatedBy?: string;
 }
 
 const { Schema } = mongoose;
@@ -19,24 +19,16 @@ const FileSchema = new Schema(
       type: String,
       required: [true, "File name is required"]
     },
-    userId: {
-      type: String,
-      required: [true, "Owner id is required"]
-    },
     gridFsId: {
       type: String,
       default: ""
-    },
-    content: {
-      type: Binary,
-      default: null
     },
     deleted: {
       type: Boolean,
       default: false
     },
-    createdBy: Number,
-    updatedBy: Number
+    createdBy: String,
+    updatedBy: String
   },
   { timestamps: true }
 );

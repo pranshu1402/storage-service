@@ -10,7 +10,7 @@ export enum UserRoles {
 // **** Types **** //
 
 export interface IUser {
-  id: number;
+  id?: number;
   name: string;
   email: string;
   pwdHash?: string;

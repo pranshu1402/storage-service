@@ -29,5 +29,6 @@ export class RegexPatterns {
 export class ApiResources {
   static readonly BASE_ROUTE = "/api";
   static readonly AUTH_BASE_ROUTE = "/auth";
-  static readonly USER_BASE_ROUTE = "/users";
+  static readonly USER_BASE_ROUTE = "/user";
+  static readonly FILE_BASE_ROUTE = "/file";
 }

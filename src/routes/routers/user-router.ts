@@ -7,11 +7,11 @@ import {
   insertRecord,
   updateRecord
 } from "@src/util/db-helper";
+import adminMw from "../shared/adminMw";
 
 // Paths
 const paths = {
-  get: "/all",
-  add: "/add",
+  add: "/register",
   update: "/update",
   delete: "/delete/:id"
 } as const;
@@ -20,17 +20,14 @@ const paths = {
 
 const userRouter = Router();
 
-// Get all users
-userRouter.get(paths.get, getAll);
-
 // Add one user
-userRouter.post(paths.add, add);
+userRouter.post(paths.add, registerUser);
 
 // Update one user
-userRouter.put(paths.update, update);
+userRouter.put(paths.update, adminMw, update);
 
 // Delete one user
-userRouter.delete(paths.delete, _delete);
+userRouter.delete(paths.delete, adminMw, _delete);
 
 // **** ROUTE HANDLERS **** //
 
@@ -49,7 +46,7 @@ async function getAll(req: IReq, res: IRes) {
 /**
  * Add one user.
  */
-async function add(req: IReq<{ user: IUser }>, res: IRes) {
+async function registerUser(req: IReq<{ user: IUser }>, res: IRes) {
   const { user } = req.body;
 
   insertRecord({
