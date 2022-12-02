@@ -49,15 +49,16 @@ async function getAll(req: IReq, res: IRes) {
 /**
  * Add one file.
  */
-async function add(req: IReq<{ user: IFile }>, res: IRes) {
-  const { user } = req.body;
+async function add(req: IReq<IFile>, res: IRes) {
+  const file = req.body;
+  console.log(file);
 
   insertRecord({
     collection: FileModel as any,
     req,
     res,
     options: {
-      body: user
+      body: file
     }
   });
 }
@@ -65,16 +66,18 @@ async function add(req: IReq<{ user: IFile }>, res: IRes) {
 /**
  * Update one file.
  */
-async function update(req: IReq<{ user: IFile }>, res: IRes) {
-  const { user } = req.body;
+async function update(req: IReq<IFile>, res: IRes) {
+  const file = req.body;
+
+  console.log(file);
 
   updateRecord({
     collection: FileModel as any,
     req,
     res,
     options: {
-      body: user,
-      query: { id: user.id }
+      body: file,
+      query: { _id: file._id }
     }
   });
 }
