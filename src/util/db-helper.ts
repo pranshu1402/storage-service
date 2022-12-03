@@ -23,7 +23,7 @@ export interface DbHelperParams {
     body?: unknown;
     query?: FilterQuery<unknown>;
     project?: unknown;
-    responseParser?: (data: unknown) => unknown;
+    responseParser?: (data: unknown, count?: number) => unknown;
     ids?: string[];
     filterOptions?: unknown;
   };
@@ -102,10 +102,6 @@ export async function fetchRecordByQuery({
     projection: project || Constants.DEFAULT_PROJECTION
   });
 
-  if (!data) {
-    throw new NotFoundError();
-  }
-
   const parsedData = responseParser ? responseParser(data) : data;
   return parsedData;
 }
@@ -155,17 +151,18 @@ export async function fetchRecordList({
 }: DbHelperParams) {
   const { query, project, responseParser } = options || {};
 
-  const queryOptions: QueryOptions = {
-    projection: project
-      ? { ...project, ...Constants.DEFAULT_PROJECTION }
-      : Constants.DEFAULT_PROJECTION,
-    ...getQueryOptionsWithSortAndPagination(req.query)
-  };
+  const queryOptions: QueryOptions = getQueryOptionsWithSortAndPagination(
+    req.query
+  );
 
   let data;
 
   Promise.all([
-    collection.find(query || {}, queryOptions),
+    collection.find(
+      query || {},
+      project || Constants.DEFAULT_PROJECTION,
+      queryOptions
+    ),
     fetchRecordCount({
       collection,
       req,
@@ -173,8 +170,10 @@ export async function fetchRecordList({
       options
     })
   ]).then(([recordList, totalCount]) => {
-    data = responseParser ? responseParser(recordList) : recordList;
-    res.status(OK).json({ totalCount, data });
+    data = responseParser
+      ? responseParser(recordList, totalCount)
+      : { totalCount, data: recordList };
+    res.status(OK).json(data);
   });
 }
 

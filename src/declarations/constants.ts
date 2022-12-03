@@ -7,9 +7,6 @@ export class Constants {
   static readonly DEFAULT_PUBLIC_PROJECTION = {
     deleted: 0,
     tenantId: 0,
-    createdAt: 0,
-    createdBy: 0,
-    updatedBy: 0,
     updatedAt: 0,
     __v: 0
   };

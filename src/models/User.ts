@@ -10,7 +10,7 @@ export enum UserRoles {
 // **** Types **** //
 
 export interface IUser {
-  id?: number;
+  _id?: string;
   name: string;
   email: string;
   pwdHash?: string;
@@ -40,9 +40,7 @@ const UserSchema = new Schema(
     deleted: {
       type: Boolean,
       default: false
-    },
-    createdBy: Number,
-    updatedBy: Number
+    }
   },
   { timestamps: true }
 );

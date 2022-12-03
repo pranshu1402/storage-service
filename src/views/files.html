@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Files</title>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/users.css" />
+</head>
+
+<body>
+
+  <!-- Upload File -->
+  <div class="users-column add-user-col">
+    <div class="column-header">
+      Upload File:
+    </div>
+    <div>
+      <input id="name-input" placeholder="Category" value="" />
+    </div>
+    <div>
+      <input id="file-input" type="file" accept="*" value="" />
+    </div>
+    <div>
+      <button id="upload-file-btn">
+        Upload file
+      </button>
+    </div>
+    <div>
+      <button id="logout-btn">
+        Logout User
+      </button>
+    </div>
+  </div>
+
+  <!-- Display Users -->
+  <div class="users-column">
+    <div class="column-header">Files:</div>
+    <div id="all-files-anchor"></div>
+  </div>
+
+</body>
+<script src="scripts/http.js"></script>
+<script src="scripts/files.js"></script>
+
+</html>
