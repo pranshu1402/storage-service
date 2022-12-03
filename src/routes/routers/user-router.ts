@@ -11,6 +11,7 @@ import adminMw from "../shared/adminMw";
 
 // Paths
 const paths = {
+  get: "/all",
   add: "/register",
   update: "/update",
   delete: "/delete/:id"
@@ -19,6 +20,9 @@ const paths = {
 // **** Setup user routes **** //
 
 const userRouter = Router();
+
+// Get all users
+userRouter.get(paths.get, getAll);
 
 // Add one user
 userRouter.post(paths.add, registerUser);
