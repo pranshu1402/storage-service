@@ -74,7 +74,7 @@ export async function updateRecord({
   const data = getAuditInfoWithUserId(options?.body || req.body, false);
 
   const updatedRecord = await collection.findOneAndUpdate(
-    query as any,
+    { ...(query || {}), deleted: false } as FilterQuery<unknown>,
     {
       $set: {
         ...(data as any)
@@ -98,9 +98,12 @@ export async function fetchRecordByQuery({
   const { query, responseParser, project } = options || {};
 
   // eslint-disable-next-line @typescript-eslint/await-thenable
-  const data = await collection.findOne(query as any, {
-    projection: project || Constants.DEFAULT_PROJECTION
-  });
+  const data = await collection.findOne(
+    { ...(query || {}), deleted: false } as FilterQuery<unknown>,
+    {
+      projection: project || Constants.DEFAULT_PROJECTION
+    }
+  );
 
   const parsedData = responseParser ? responseParser(data) : data;
   return parsedData;
@@ -159,7 +162,7 @@ export async function fetchRecordList({
 
   Promise.all([
     collection.find(
-      query || {},
+      { ...(query || {}), deleted: false },
       project || Constants.DEFAULT_PROJECTION,
       queryOptions
     ),
@@ -183,7 +186,7 @@ export async function fetchRecordCount({
 }: DbHelperParams) {
   const { query } = options || {};
   const count = await collection.countDocuments(
-    query as FilterQuery<unknown>,
+    { ...query, deleted: false } as FilterQuery<unknown>,
     options?.filterOptions || {}
   );
 
@@ -200,12 +203,15 @@ export async function deleteRecord({
 }: DbHelperParams) {
   const data = getAuditInfoWithUserId(options?.body || req.body, false);
 
-  const updatedDocumentsResponse = await collection.updateMany(options?.query, {
-    $set: {
-      ...(data as any),
-      deleted: true
+  const updatedDocumentsResponse = await collection.updateMany(
+    { ...(options?.query || {}), deleted: false },
+    {
+      $set: {
+        ...(data as any),
+        deleted: true
+      }
     }
-  });
+  );
 
   if (updatedDocumentsResponse.acknowledged) {
     res.status(OK).json({

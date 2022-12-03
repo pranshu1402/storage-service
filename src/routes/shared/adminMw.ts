@@ -8,7 +8,7 @@ import { JwtPayload } from "jsonwebtoken";
 import HttpStatusCodes from "@src/declarations/major/HttpStatusCodes";
 import EnvVars from "@src/declarations/major/EnvVars";
 import jwtUtil from "@src/util/jwt-util";
-import { IUser, UserRoles } from "@src/models/User";
+import { IUser } from "@src/models/User";
 import pwdUtil from "@src/util/pwd-util";
 
 // **** Variables **** //
@@ -85,7 +85,7 @@ export async function generatePwdHash(
 
     const passwordHash = await pwdUtil.getHash(password);
     newUserData.pwdHash = passwordHash;
-    req.body.user = newUserData;
+    req.body.user = newUserData as IUser;
     await populateJwtCookie(req, res);
     return next();
     // Return an unauth error if user is not an admin
