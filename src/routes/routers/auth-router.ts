@@ -8,7 +8,7 @@ import UserModel, { IUser } from "@src/models/User";
 import { isEmpty, tick } from "@src/declarations/functions";
 import { RouteError } from "@src/declarations/errors";
 import pwdUtil from "@src/util/pwd-util";
-import jwtUtil from "@src/util/jwt-util";
+import { populateJwtCookie } from "../shared/adminMw";
 
 // **** Variables **** //
 
@@ -32,6 +32,7 @@ authRouter.get(paths.logout, logout);
 interface ILoginReq {
   email: string;
   password: string;
+  user?: IUser;
 }
 
 // Errors
@@ -46,9 +47,7 @@ export const errors = {
  * Login a user.
  */
 async function login(req: IReq<ILoginReq>, res: IRes) {
-  const jwt = await getJwt(req, res);
-  const { key, options } = EnvVars.cookieProps;
-  res.cookie(key, jwt, options);
+  await authenticateUser(req, res);
   // Return
   return res.status(HttpStatusCodes.OK).end();
 }
@@ -65,7 +64,10 @@ function logout(_: IReq, res: IRes) {
 /**
  * Login a user.
  */
-async function getJwt(req: IReq<ILoginReq>, res: IRes): Promise<string> {
+async function authenticateUser(
+  req: IReq<ILoginReq>,
+  res: IRes
+): Promise<string> {
   const { email, password } = req.body;
 
   // Fetch user
@@ -92,12 +94,9 @@ async function getJwt(req: IReq<ILoginReq>, res: IRes): Promise<string> {
     throw new RouteError(HttpStatusCodes.UNAUTHORIZED, errors.unauth);
   }
   // Setup Admin Cookie
-  return jwtUtil.sign({
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role
-  });
+  req.body.user = user;
+  await populateJwtCookie(req, res);
+  return Promise.resolve("Logged in");
 }
 
 export default authRouter;

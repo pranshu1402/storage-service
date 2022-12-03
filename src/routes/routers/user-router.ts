@@ -7,11 +7,13 @@ import {
   insertRecord,
   updateRecord
 } from "@src/util/db-helper";
-import adminMw from "../shared/adminMw";
+import adminMw, { generatePwdHash } from "../shared/adminMw";
+import { ObjectId } from "mongodb";
 
 // Paths
 const paths = {
-  add: "/register",
+  getAll: "/all",
+  register: "/register",
   update: "/update",
   delete: "/delete/:id"
 } as const;
@@ -20,8 +22,11 @@ const paths = {
 
 const userRouter = Router();
 
+// Get all users
+userRouter.get(paths.getAll, adminMw, getAll);
+
 // Add one user
-userRouter.post(paths.add, registerUser);
+userRouter.post(paths.register, generatePwdHash, registerUser);
 
 // Update one user
 userRouter.put(paths.update, adminMw, update);
@@ -39,7 +44,13 @@ async function getAll(req: IReq, res: IRes) {
     collection: UserModel as any,
     req,
     res,
-    options: {}
+    options: {
+      responseParser: (userList, totalCount) => ({
+        users: userList,
+        totalCount
+      }),
+      project: { name: 1, email: 1, role: 1 }
+    }
   });
 }
 
@@ -71,7 +82,7 @@ async function update(req: IReq<{ user: IUser }>, res: IRes) {
     res,
     options: {
       body: user,
-      query: { id: user.id }
+      query: { _id: user._id }
     }
   });
 }
@@ -88,7 +99,7 @@ async function _delete(req: IReq, res: IRes) {
     res,
     options: {
       body: {},
-      query: { id: { $in: [id] } }
+      query: { _id: { $in: [new ObjectId(id)] } }
     }
   });
 }

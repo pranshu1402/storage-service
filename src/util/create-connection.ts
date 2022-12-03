@@ -2,14 +2,14 @@ import logger from "jet-logger";
 import mongoose from "mongoose";
 import { isEmpty } from "@src/declarations/functions";
 import EnvVars from "@src/declarations/major/EnvVars";
+import { GridFsStorage } from "multer-gridfs-storage";
 import { GridFSBucket } from "mongodb";
 
-let bucket: any;
+let bucket: GridFSBucket;
 
-const createDBConnection = () => {
+const createDBConnection = async () => {
   const connectionString = EnvVars.dbConnectionString;
 
-  console.log("inside create connection", connectionString);
   if (isEmpty(connectionString)) {
     return Promise.reject("Please provide db url to connect to");
   }
@@ -17,8 +17,8 @@ const createDBConnection = () => {
   mongoose.connection.on("connected", () => {
     const db = mongoose.connections[0].db;
     bucket = new mongoose.mongo.GridFSBucket(db, {
-      bucketName: "newBucket"
-    });
+      bucketName: "uploads"
+    }) as GridFSBucket;
     logger.info("Connected to database & bucket created");
   });
 
@@ -26,8 +26,30 @@ const createDBConnection = () => {
     logger.info("Error: Connecting to database failed," + err.message);
   });
 
-  return mongoose.connect(connectionString as string);
+  const connection = await mongoose.connect(connectionString as string);
+
+  return connection;
 };
+
+export function initializeStorage() {
+  const connectionString = EnvVars.dbConnectionString;
+
+  const storage = new GridFsStorage({
+    url: connectionString,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        const filename = file.originalname;
+        const fileInfo = {
+          filename: filename,
+          bucketName: "uploads"
+        };
+        resolve(fileInfo);
+      });
+    }
+  });
+
+  return storage;
+}
 
 export function getGridBucket() {
   return bucket;

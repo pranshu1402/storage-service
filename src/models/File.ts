@@ -1,14 +1,21 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 // **** Types **** //
 
+export interface IFileReq {
+  category: string;
+  file: any;
+}
+
 export interface IFile {
-  _id?: any;
+  _id?: string | ObjectId;
   fileName: string;
+  fileType: string;
+  fileSize?: number;
+  category: string;
+  userId: string;
   gridFsId?: string;
-  deleted?: boolean;
-  createdBy: string;
-  updatedBy?: string;
 }
 
 const { Schema } = mongoose;
@@ -19,16 +26,30 @@ const FileSchema = new Schema(
       type: String,
       required: [true, "File name is required"]
     },
+    fileType: {
+      type: String,
+      required: [true, "File type is required"]
+    },
+    fileSize: {
+      type: Number,
+      default: 0
+    },
+    category: {
+      type: String,
+      required: [true, "File category is required"]
+    },
     gridFsId: {
       type: String,
       default: ""
     },
+    userId: {
+      type: String,
+      required: [true, "Owner identity is required"]
+    },
     deleted: {
       type: Boolean,
       default: false
-    },
-    createdBy: String,
-    updatedBy: String
+    }
   },
   { timestamps: true }
 );

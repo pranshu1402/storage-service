@@ -88,4 +88,14 @@ app.get("/users", (req: Request, res: Response) => {
   }
 });
 
+// Redirect to login if not logged in.
+app.get("/files", (req: Request, res: Response) => {
+  const jwt = req.signedCookies[EnvVars.cookieProps.key];
+  if (!jwt) {
+    res.redirect("/");
+  } else {
+    res.sendFile("files.html", { root: viewsDir });
+  }
+});
+
 export default app;
