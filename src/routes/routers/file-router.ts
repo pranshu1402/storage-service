@@ -7,6 +7,10 @@ import {
   insertRecord,
   updateRecord
 } from "@src/util/db-helper";
+import multer from "multer";
+import { GridFsStorage } from "multer-gridfs-storage";
+
+const upload = multer({ dest: "./public/uploads" });
 
 // Paths
 const paths = {
@@ -24,7 +28,7 @@ const fileRouter = Router();
 fileRouter.get(paths.get, getAll);
 
 // Add one user
-fileRouter.post(paths.add, add);
+fileRouter.post(paths.add, upload.single("file"), add);
 
 // Update one user
 fileRouter.put(paths.update, update);
@@ -51,7 +55,7 @@ async function getAll(req: IReq, res: IRes) {
  */
 async function add(req: IReq<IFile>, res: IRes) {
   const file = req.body;
-  console.log(file);
+  console.log(file, req.file, req.files);
 
   insertRecord({
     collection: FileModel as any,

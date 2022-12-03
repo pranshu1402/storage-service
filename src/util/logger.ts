@@ -44,12 +44,12 @@ export const logger = createLogger({
     }),
     formatLogMessage
   ),
-  transports: [new transports.Console({ level: "debug" })]
+  transports: [new transports.Console({ level: "info" })]
 });
 
 export const setLogLevel = () => {
-  logger.info(`Setting level to debug as per config.`);
+  logger.info(`Setting level to info as per config.`);
   logger.configure({
-    transports: [new transports.Console({ level: "debug" })]
+    transports: [new transports.Console({ level: "info" })]
   });
 };
