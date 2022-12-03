@@ -124,7 +124,7 @@ async function upload(req: IReq<IFileReq>, res: IRes) {
  * Delete one file.
  */
 async function _delete(req: IReq, res: IRes) {
-  const id = +req.params.id;
+  const id = req.params.id;
 
   deleteRecord({
     collection: FileModel as any,
@@ -132,7 +132,7 @@ async function _delete(req: IReq, res: IRes) {
     res,
     options: {
       body: {},
-      query: { id: { $in: [id] } }
+      query: { _id: { $in: [new ObjectId(id)] } }
     }
   });
 }
