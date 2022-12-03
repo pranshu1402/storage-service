@@ -113,7 +113,7 @@ function downloadFile(ele) {
  */
 function deleteFile(ele) {
   var id = ele.getAttribute("data-file-id");
-  Http.delete("/api/file/delete/" + id).then(() => displayFiles());
+  Http.delete("/api/file/remove/" + id).then(() => displayFiles());
 }
 
 // **** Logout **** //

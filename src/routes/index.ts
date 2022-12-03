@@ -1,6 +1,5 @@
 import { Router } from "express";
 
-import adminMw from "./shared/adminMw";
 import authRouter from "./routers/auth-router";
 import userRouter from "./routers/user-router";
 import { ApiResources } from "@src/declarations/constants";
