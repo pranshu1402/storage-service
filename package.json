@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
-    "axios": "^1.2.0",
     "bcrypt": "^5.1.0",
     "command-line-args": "^5.2.1",
     "cookie-parser": "^1.4.6",
