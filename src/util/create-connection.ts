@@ -1,4 +1,4 @@
-import logger from "jet-logger";
+import { logger } from "@src/util/logger";
 import mongoose from "mongoose";
 import { isEmpty } from "@src/declarations/functions";
 import EnvVars from "@src/declarations/major/EnvVars";

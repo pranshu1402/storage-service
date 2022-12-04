@@ -8,7 +8,7 @@ import helmet from "helmet";
 import "express-async-errors";
 
 import BaseRouter from "./routes";
-import logger from "jet-logger";
+import { logger } from "@src/util/logger";
 import EnvVars from "@src/declarations/major/EnvVars";
 import HttpStatusCodes from "@src/declarations/major/HttpStatusCodes";
 import { NodeEnvs } from "@src/declarations/enums";
@@ -31,13 +31,35 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(EnvVars.cookieProps.secret));
-if (EnvVars.nodeEnv === NodeEnvs.Dev) {
-  // Show routes called in console during development
-  app.use(morgan("dev"));
-} else {
+if (EnvVars.nodeEnv === NodeEnvs.Production) {
   // Security ***********
   app.use(helmet());
 }
+
+/* eslint-disable max-len */
+app.use(
+  morgan(
+    ":server :method :url :status :response-time ms - :res[content-length]"
+  )
+);
+
+morgan.token("server", function (req) {
+  const host = req.headers.host;
+  const port = host?.split(":")?.[1]?.toString();
+  
+  switch (port) {
+  case "3000":
+    return "Server1";
+  case "3001":
+    return "Server2";
+  case "3002":
+    return "Server3";
+  case "3003":
+    return "Server4";
+  default:
+    return port;
+  }
+});
 
 /*************************************************************
  *        BASE API ROUTER and ERROR HANDLING MIDDLEWARE
@@ -52,7 +74,7 @@ app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     next: NextFunction
   ) => {
-    logger.err(err, true);
+    logger.error(err.message, true);
     let status = HttpStatusCodes.BAD_REQUEST;
     if (err instanceof RouteError) {
       status = err.status;
