@@ -31,10 +31,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(EnvVars.cookieProps.secret));
-if (EnvVars.nodeEnv === NodeEnvs.Production) {
-  // Security ***********
-  app.use(helmet());
-}
 
 /* eslint-disable max-len */
 app.use(
@@ -60,6 +56,11 @@ morgan.token("server", function (req) {
     return port;
   }
 });
+
+if (EnvVars.nodeEnv === NodeEnvs.Production) {
+  // Security ***********
+  app.use(helmet());
+}
 
 /*************************************************************
  *        BASE API ROUTER and ERROR HANDLING MIDDLEWARE
