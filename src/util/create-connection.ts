@@ -26,7 +26,13 @@ const createDBConnection = async () => {
     logger.info("Error: Connecting to database failed," + err.message);
   });
 
-  const connection = await mongoose.connect(connectionString as string);
+  const connection = await mongoose.connect(connectionString as string, {
+    maxPoolSize: 10,
+    replicaSet: "rs",
+    retryWrites: true,
+    readPreference: "secondaryPreferred",
+    writeConcern: { w: "majority", j: true }
+  });
 
   return connection;
 };
