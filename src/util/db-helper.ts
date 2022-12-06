@@ -26,6 +26,7 @@ export interface DbHelperParams {
     responseParser?: (data: unknown, count?: number) => unknown;
     ids?: string[];
     filterOptions?: unknown;
+    callback?: (data: unknown) => Promise<unknown>;
   };
 }
 
@@ -56,6 +57,7 @@ export async function insertRecord({
   const newRecord = await new collection(data).save();
 
   if (newRecord._id) {
+    await options?.callback?.(newRecord);
     res.status(CREATED).json({ data: newRecord });
   } else {
     throw new ServerError(INSERT_RECORD_ERROR_MESSAGE);

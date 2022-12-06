@@ -86,7 +86,6 @@ export async function generatePwdHash(
     const passwordHash = await pwdUtil.getHash(password);
     newUserData.pwdHash = passwordHash;
     req.body.user = newUserData as IUser;
-    await populateJwtCookie(req, res);
     return next();
     // Return an unauth error if user is not an admin
   } else {
