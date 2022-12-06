@@ -7,7 +7,7 @@ import {
   insertRecord,
   updateRecord
 } from "@src/util/db-helper";
-import adminMw, { generatePwdHash } from "../shared/adminMw";
+import adminMw, { generatePwdHash, populateJwtCookie } from "../shared/adminMw";
 import { ObjectId } from "mongodb";
 
 // Paths
@@ -65,7 +65,11 @@ async function registerUser(req: IReq<{ user: IUser }>, res: IRes) {
     req,
     res,
     options: {
-      body: user
+      body: user,
+      callback: async (userData) => {
+        req.body.user._id = (userData as IUser)._id;
+        await populateJwtCookie(req, res);
+      }
     }
   });
 }
