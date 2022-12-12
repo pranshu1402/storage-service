@@ -30,11 +30,24 @@ function getFileDisplayEle(file) {
 
       <div class="normal-view">
         <div>Name: ${file.fileName}</div>
-        <div>Size: ${file.fileSize}</div>
-        <button class="download-file-btn" id="download-file-btn" data-file-id="${file._id}">
+        <div>Size: ${Number(file.fileSize / (1024 * 1024)).toFixed(2)} MB</div>
+        <div>Category: ${file.category}</div>
+        <div>
+          <input type="email" value="" id="guest-user-email-input" />
+          <button class="share-file-btn" id="share-file-btn" data-file-id="${
+            file._id
+          }">
+            Share
+          </button>
+        </div>
+        <button class="download-file-btn" id="download-file-btn" data-file-id="${
+          file._id
+        }">
           Download
         </button>
-        <button class="delete-user-btn" id="delete-file-btn" data-file-id="${file._id}">
+        <button class="delete-user-btn" id="delete-file-btn" data-file-id="${
+          file._id
+        }">
           Delete
         </button>
       </div>
@@ -51,6 +64,9 @@ document.addEventListener(
     if (ele.matches("#upload-file-btn")) {
       event.preventDefault();
       uploadFile();
+    } else if (ele.matches("#share-file-btn")) {
+      event.preventDefault();
+      shareFile(ele);
     } else if (ele.matches("#download-file-btn")) {
       event.preventDefault();
       downloadFile(ele);
@@ -97,7 +113,20 @@ function uploadFile() {
 }
 
 /**
- * Delete a user
+ * Share a file
+ */
+function shareFile(ele) {
+  const guestUserEmailInput = document.getElementById("guest-user-email-input");
+  if (!guestUserEmailInput?.value) return;
+
+  const id = ele.getAttribute("data-file-id");
+  Http.post("/api/file/share/" + id, {
+    guestUserEmail: guestUserEmailInput.value
+  }).then(() => (guestUserEmailInput.value = ""));
+}
+
+/**
+ * Download a file
  */
 function downloadFile(ele) {
   var id = ele.getAttribute("data-file-id");
@@ -109,7 +138,7 @@ function downloadFile(ele) {
 }
 
 /**
- * Delete a user
+ * Delete a file
  */
 function deleteFile(ele) {
   var id = ele.getAttribute("data-file-id");

@@ -5,7 +5,8 @@ import {
   deleteRecord,
   fetchRecordByQuery,
   fetchRecordList,
-  insertRecord
+  insertRecord,
+  updateRecord
 } from "@src/util/db-helper";
 import { getGridBucket, initializeStorage } from "@src/util/create-connection";
 import adminMw from "../shared/adminMw";
@@ -16,6 +17,7 @@ import { ObjectId } from "mongodb";
 // Paths
 const paths = {
   listAll: "/all",
+  share: "/share/:id",
   download: "/download/:id",
   upload: "/upload",
   remove: "/remove/:id"
@@ -29,6 +31,9 @@ fileRouter.use(adminMw);
 
 // Get all files
 fileRouter.get(paths.listAll, getAll);
+
+// share a file
+fileRouter.post(paths.share, share);
 
 // download a file
 fileRouter.get(paths.download, download);
@@ -46,7 +51,7 @@ fileRouter.delete(paths.remove, _delete);
 // **** ROUTE HANDLERS **** //
 
 /**
- * Get all files.
+ * Get a file.
  */
 async function download(req: IReq, res: IRes) {
   const fileId = req.params.id;
@@ -67,16 +72,28 @@ async function download(req: IReq, res: IRes) {
   const readStream = getGridBucket().openDownloadStream(
     new ObjectId(fileRecord.gridFsId)
   );
-  // ({
-  //   _id: fileRecord.gridFsId,
-  //   filename: fileRecord.fileName
-  // });
 
   readStream.pipe(res);
 }
 
+async function share(req: IReq<any>, res: IRes) {
+  const fileId = req.params.id;
+
+  updateRecord({
+    collection: FileModel as any,
+    req,
+    res,
+    options: {
+      body: {
+        guestUsers: [req.body.guestUserEmail]
+      },
+      query: { _id: { $in: [new ObjectId(fileId)] } }
+    }
+  });
+}
+
 /**
- * download a file
+ * get all files
  */
 async function getAll(req: IReq, res: IRes) {
   fetchRecordList({
@@ -84,7 +101,16 @@ async function getAll(req: IReq, res: IRes) {
     req,
     res,
     options: {
-      query: { userId: res.locals?.sessionUser?._id }
+      query: {
+        $or: [
+          {
+            userId: res.locals?.sessionUser?._id
+          },
+          {
+            guestUsers: { $in: [res.locals?.sessionUser?.email] }
+          }
+        ]
+      }
     }
   });
 }
