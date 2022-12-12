@@ -15,6 +15,7 @@ export interface IFile {
   fileSize?: number;
   category: string;
   userId: string;
+  guestUsers?: string[];
   gridFsId?: string;
 }
 
@@ -45,6 +46,9 @@ const FileSchema = new Schema(
     userId: {
       type: String,
       required: [true, "Owner identity is required"]
+    },
+    guestUsers: {
+      type: Array<string>
     },
     deleted: {
       type: Boolean,
